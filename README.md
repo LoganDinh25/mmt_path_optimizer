@@ -134,9 +134,6 @@ Publishing, 2019.
 [4] Bayram, V., Aydo˘gan, C¸ . & Kargar, K., ”Multi-period hub network design from a dual perspective:
 An integrated approach considering congestion, demand uncertainty, and service quality optimization”, European Journal of Operational Research, 2025.
 
-Pyomo Documentation: https://pyomo.readthedocs.io
-
-HiGHS Solver: https://highs.dev
 
 License
 
