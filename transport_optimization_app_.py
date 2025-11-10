@@ -8,15 +8,15 @@ import heapq
 import time
 import numpy as np
 
-# ======== CÀI ĐẶT BAN ĐẦU ========
+# ======== INITIAL SETUP ========
 st.set_page_config(
-    page_title="Tối ưu Mạng lưới Vận tải Đa phương thức",
+    page_title="Multimodal Transport Network Optimization",
     page_icon="🚚",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ======== CSS TÙY CHỈNH ========
+# ======== CUSTOM CSS ========
 st.markdown("""
 <style>
     .main-header {
@@ -83,9 +83,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ======== CÁC HÀM MÔ HÌNH ========
+# ======== MODEL FUNCTIONS ========
 def build_expanded_graph(n_physical, edges):
-    """Xây dựng đồ thị mở rộng"""
+    """Build the expanded graph"""
     G_exp = defaultdict(list)
     
     for i in range(n_physical):
@@ -103,7 +103,7 @@ def build_expanded_graph(n_physical, edges):
     return G_exp, n_physical
 
 def create_baseline_model(data):
-    """Tạo mô hình cơ sở (trước khi tối ưu)"""
+    """Create the baseline model (before optimization)"""
     baseline_results = {
         'status': 'Baseline',
         'objective': 1200000,
@@ -137,10 +137,10 @@ def create_baseline_model(data):
     return baseline_results
 
 def create_optimization_model(data):
-    """Tạo và giải mô hình tối ưu"""
+    """Create and solve the optimization model"""
     try:
-        # [Code mô hình tối ưu giữ nguyên...]
-        # Trả về kết quả mẫu cho demo
+        # [Optimization model code remains unchanged...]
+        # Return sample results for the demo
         return {
             'status': 'Optimal',
             'objective': 1000000,
@@ -170,7 +170,7 @@ def create_optimization_model(data):
         }
         
     except Exception as e:
-        st.error(f"Lỗi khi giải mô hình: {str(e)}")
+        st.error(f"Error solving the model: {str(e)}")
         return {
             'status': 'Error',
             'objective': 1000000,
@@ -199,37 +199,37 @@ def create_optimization_model(data):
             }
         }
 
-# ======== BIỂU ĐỒ MẠNG LƯỚI CẢI TIẾN - LAYOUT TỐT HƠN ========
+# ======== ENHANCED NETWORK DIAGRAMS - BETTER LAYOUT ========
 def draw_network_comparison(physical_edges, baseline_results, optimized_results, province_names):
-    """Vẽ so sánh mạng lưới trước và sau tối ưu - LAYOUT CẢI TIẾN"""
+    """Draw a comparison of the network before and after optimization - enhanced layout"""
     G = nx.MultiDiGraph()
     
-    # Thêm các cạnh với thông tin phương thức
+    # Add edges with mode information
     for u, v, mode, length in physical_edges:
         G.add_edge(u, v, mode=mode, length=length, weight=length)
     
-    # Sử dụng layout tốt hơn với khoảng cách lớn hơn
+    # Use an improved layout with greater spacing
     pos = _create_better_layout(G)
     
-    # Tăng kích thước figure
+    # Increase the figure size
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 10))
     
-    # Biểu đồ 1: Mạng lưới trước tối ưu
+    # Chart 1: Network before optimization
     _draw_baseline_network_improved(ax1, G, pos, baseline_results, province_names)
     
-    # Biểu đồ 2: Mạng lưới sau tối ưu
+    # Chart 2: Network after optimization
     _draw_optimized_network_improved(ax2, G, pos, optimized_results, province_names)
     
     plt.tight_layout()
     return fig
 
 def _create_better_layout(G):
-    """Tạo layout tốt hơn với khoảng cách giữa các node"""
-    # Sử dụng circular layout với bán kính lớn hơn
+    """Create a better layout with spacing between nodes"""
+    # Use a circular layout with a larger radius
     pos = nx.circular_layout(G, scale=2)
     
-    # Điều chỉnh thủ công vị trí các node để tạo khoảng cách tốt hơn
-    if len(pos) == 5:  # Nếu có 5 node như trong ví dụ
+    # Manually adjust node positions to create better spacing
+    if len(pos) == 5:  # If there are 5 nodes as in the example
         pos = {
             0: [-1.5, 0.5],
             1: [-0.5, 1.5],
@@ -241,76 +241,76 @@ def _create_better_layout(G):
     return pos
 
 def _draw_baseline_network_improved(ax, G, pos, results, province_names):
-    """Vẽ mạng lưới cơ sở với đường bộ và đường thủy riêng biệt - LAYOUT TỐT HƠN"""
-    # Tăng kích thước node và text
+    """Draw the baseline network with separate road and waterway edges - improved layout"""
+    # Increase node and text sizes
     node_size = 1200
     font_size = 12
     
-    # Vẽ nodes
+    # Draw nodes
     nx.draw_networkx_nodes(G, pos, node_color='lightgray', 
                           node_size=node_size, edgecolors='black', ax=ax)
     
-    # Vẽ edges theo từng phương thức riêng biệt
+    # Draw edges separately for each mode
     road_edges = [(u, v) for u, v, key in G.edges(keys=True) if G[u][v][key]['mode'] == 1]
     water_edges = [(u, v) for u, v, key in G.edges(keys=True) if G[u][v][key]['mode'] == 2]
     
-    # Vẽ đường bộ - màu cam, có mũi tên
+    # Draw road edges - orange with arrows
     nx.draw_networkx_edges(G, pos, edgelist=road_edges,
                           edge_color='orange', width=3, alpha=0.8,
                           arrows=True, arrowstyle='-|>', arrowsize=25,
-                          connectionstyle='arc3,rad=0.2', ax=ax)  # Tăng độ cong
+                          connectionstyle='arc3,rad=0.2', ax=ax)  # Increase curvature
     
-    # Vẽ đường thủy - màu xanh dương, có mũi tên
+    # Draw waterway edges - blue with arrows
     nx.draw_networkx_edges(G, pos, edgelist=water_edges,
                           edge_color='blue', width=3, alpha=0.8,
                           arrows=True, arrowstyle='-|>', arrowsize=25,
-                          connectionstyle='arc3,rad=-0.2', ax=ax)  # Tăng độ cong
+                          connectionstyle='arc3,rad=-0.2', ax=ax)  # Increase curvature
     
-    # Node labels với tên tỉnh - tăng font size
+    # Node labels with province names - larger font size
     node_labels = {node: province_names.get(node, f"Node {node}") for node in G.nodes()}
     nx.draw_networkx_labels(G, pos, labels=node_labels, font_size=font_size, ax=ax)
     
-    # Edge labels với độ dài - tăng font size và khoảng cách
+    # Edge labels with distance - larger font size and spacing
     edge_labels = {}
     for u, v, key in G.edges(keys=True):
         mode = G[u][v][key]['mode']
         length = G[u][v][key]['length']
         edge_labels[(u, v, key)] = f"{length}km"
     
-    # Vẽ edge labels với vị trí dịch chuyển để tránh trùng
+    # Draw edge labels with offsets to avoid overlap
     for (u, v, key), label in edge_labels.items():
         mode = G[u][v][key]['mode']
         x = (pos[u][0] + pos[v][0]) / 2
         y = (pos[u][1] + pos[v][1]) / 2
         
-        # Dịch chuyển label dựa trên phương thức để tránh trùng
-        if mode == 1:  # Đường bộ
+        # Offset labels based on mode to avoid overlap
+        if mode == 1:  # Road
             y += 0.15
             color = 'darkorange'
-        else:  # Đường thủy
+        else:  # Waterway
             y -= 0.15
             color = 'darkblue'
             
         ax.text(x, y, label, fontsize=10, color=color, ha='center', va='center',
                bbox=dict(boxstyle="round,pad=0.3", facecolor='white', alpha=0.9, edgecolor=color))
     
-    ax.set_title("Mạng lưới TRƯỚC Tối ưu", fontsize=16, fontweight='bold')
+    ax.set_title("Network BEFORE Optimization", fontsize=16, fontweight='bold')
     ax.axis('off')
     
-    # Thêm chú thích
+    # Add legend
     legend_elements = [
-        plt.Line2D([0], [0], color='orange', lw=3, label='Đường bộ', marker='>', markersize=12),
-        plt.Line2D([0], [0], color='blue', lw=3, label='Đường thủy', marker='>', markersize=12),
+        plt.Line2D([0], [0], color='orange', lw=3, label='Road', marker='>', markersize=12),
+        plt.Line2D([0], [0], color='blue', lw=3, label='Waterway', marker='>', markersize=12),
     ]
     ax.legend(handles=legend_elements, loc='upper right', fontsize=12)
 
 def _draw_optimized_network_improved(ax, G, pos, results, province_names):
-    """Vẽ mạng lưới sau tối ưu với đường bộ và đường thủy riêng biệt - LAYOUT TỐT HƠN"""
-    # Tăng kích thước node và text
+    """Draw the optimized network with separate road and waterway edges - improved layout"""
+    # Increase node and text sizes
     node_size = 1200
     font_size = 12
     
-    # Phân loại edges
+    # Categorize edges
     regular_road_edges = []
     regular_water_edges = []
     upgraded_road_edges = []
@@ -320,7 +320,7 @@ def _draw_optimized_network_improved(ax, G, pos, results, province_names):
         mode = G[u][v][key]['mode']
         is_upgraded = False
         
-        # Kiểm tra xem cạnh này có được nâng cấp không
+        # Check if this edge was upgraded
         for arc in results.get('upgraded_arcs', []):
             start_node, end_virtual = arc
             end_node = int(end_virtual.split('^')[0]) if isinstance(end_virtual, str) and '^' in end_virtual else end_virtual
@@ -341,7 +341,7 @@ def _draw_optimized_network_improved(ax, G, pos, results, province_names):
             else:
                 regular_water_edges.append((u, v))
     
-    # Vẽ regular edges
+    # Draw regular edges
     nx.draw_networkx_edges(G, pos, edgelist=regular_road_edges,
                           edge_color='orange', width=2.5, alpha=0.7,
                           arrows=True, arrowstyle='-|>', arrowsize=20,
@@ -352,7 +352,7 @@ def _draw_optimized_network_improved(ax, G, pos, results, province_names):
                           arrows=True, arrowstyle='-|>', arrowsize=20,
                           connectionstyle='arc3,rad=-0.2', ax=ax)
     
-    # Vẽ upgraded edges
+    # Draw upgraded edges
     if upgraded_road_edges:
         nx.draw_networkx_edges(G, pos, edgelist=upgraded_road_edges,
                               edge_color='red', width=5, alpha=0.9,
@@ -365,7 +365,7 @@ def _draw_optimized_network_improved(ax, G, pos, results, province_names):
                               arrows=True, arrowstyle='-|>', arrowsize=30,
                               connectionstyle='arc3,rad=-0.2', ax=ax)
     
-    # Vẽ nodes
+    # Draw nodes
     node_colors = []
     node_sizes = []
     for node in G.nodes():
@@ -379,7 +379,7 @@ def _draw_optimized_network_improved(ax, G, pos, results, province_names):
     nx.draw_networkx_nodes(G, pos, node_color=node_colors, 
                           node_size=node_sizes, edgecolors='black', ax=ax)
     
-    # Node labels với tên tỉnh
+    # Node labels with province names
     node_labels = {node: province_names.get(node, f"Node {node}") for node in G.nodes()}
     nx.draw_networkx_labels(G, pos, labels=node_labels, font_size=font_size, ax=ax)
     
@@ -394,7 +394,7 @@ def _draw_optimized_network_improved(ax, G, pos, results, province_names):
         x = (pos[u][0] + pos[v][0]) / 2
         y = (pos[u][1] + pos[v][1]) / 2
         
-        # Dịch chuyển label
+        # Offset label
         if mode == 1:
             y += 0.15
             color = 'darkorange'
@@ -405,73 +405,73 @@ def _draw_optimized_network_improved(ax, G, pos, results, province_names):
         ax.text(x, y, label, fontsize=10, color=color, ha='center', va='center',
                bbox=dict(boxstyle="round,pad=0.3", facecolor='white', alpha=0.9, edgecolor=color))
     
-    ax.set_title("Mạng lưới SAU Tối ưu", fontsize=16, fontweight='bold')
+    ax.set_title("Network AFTER Optimization", fontsize=16, fontweight='bold')
     ax.axis('off')
     
-    # Thêm chú thích
+    # Add legend
     legend_elements = [
-        plt.Line2D([0], [0], color='orange', lw=3, label='Đường bộ'),
-        plt.Line2D([0], [0], color='blue', lw=3, label='Đường thủy'),
-        plt.Line2D([0], [0], color='red', lw=5, label='Tuyến nâng cấp'),
+        plt.Line2D([0], [0], color='orange', lw=3, label='Road'),
+        plt.Line2D([0], [0], color='blue', lw=3, label='Waterway'),
+        plt.Line2D([0], [0], color='red', lw=5, label='Upgraded route'),
         plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='gold', 
-                  markersize=15, label='Hub nâng cấp'),
+                  markersize=15, label='Upgraded hub'),
     ]
     ax.legend(handles=legend_elements, loc='upper right', fontsize=11)
 
-# ======== BIỂU ĐỒ PHÂN BỔ HÀNG HÓA CẢI TIẾN - LAYOUT TỐT HƠN ========
+# ======== ENHANCED COMMODITY DISTRIBUTION DIAGRAMS - BETTER LAYOUT ========
 def create_commodity_specific_networks(physical_edges, flow_by_commodity, province_names):
-    """Tạo nhiều biểu đồ mạng lưới - mỗi biểu đồ cho một loại hàng hóa - LAYOUT TỐT HƠN"""
+    """Create multiple network diagrams - one per commodity - improved layout"""
     
-    # Tách dữ liệu theo từng loại hàng hóa
+    # Split data by commodity type
     passenger_flows = {edge: flow for (commodity, edge), flow in flow_by_commodity.items() if commodity == 'passenger'}
     rice_flows = {edge: flow for (commodity, edge), flow in flow_by_commodity.items() if commodity == 'rice'}
     container_flows = {edge: flow for (commodity, edge), flow in flow_by_commodity.items() if commodity == 'container'}
     
-    # Tạo biểu đồ cho từng loại hàng hóa
+    # Create a chart for each commodity
     fig1 = _draw_single_commodity_network_improved(physical_edges, passenger_flows, province_names, 
-                                                  "HÀNH KHÁCH", "#FF6B6B", "👥")
+                                                  "PASSENGERS", "#FF6B6B", "👥")
     fig2 = _draw_single_commodity_network_improved(physical_edges, rice_flows, province_names, 
-                                                  "LÚA GẠO", "#4ECDC4", "🌾")
+                                                  "RICE", "#4ECDC4", "🌾")
     fig3 = _draw_single_commodity_network_improved(physical_edges, container_flows, province_names, 
                                                   "CONTAINER", "#FFEAA7", "📦")
     
     return fig1, fig2, fig3
 
 def _draw_single_commodity_network_improved(physical_edges, commodity_flows, province_names, title, color, emoji):
-    """Vẽ biểu đồ mạng lưới cho một loại hàng hóa cụ thể - LAYOUT TỐT HƠN"""
+    """Draw a network diagram for a specific commodity - improved layout"""
     G = nx.MultiDiGraph()
     
-    # Thêm các cạnh với thông tin phương thức
+    # Add edges with mode information
     for u, v, mode, length in physical_edges:
         G.add_edge(u, v, mode=mode, length=length)
     
-    # Sử dụng layout tốt hơn
+    # Use an improved layout
     pos = _create_better_layout(G)
     
-    # Tăng kích thước figure
+    # Increase the figure size
     fig, ax = plt.subplots(figsize=(14, 10))
     
-    # Tính toán độ rộng tối đa để chuẩn hóa
+    # Calculate maximum width for normalization
     max_flow = max(commodity_flows.values()) if commodity_flows else 1
     
-    # Vẽ các cạnh với độ dày tỷ lệ với lưu lượng và phân biệt phương thức
+    # Draw edges with thickness proportional to flow and distinguish modes
     for u, v, key in G.edges(keys=True):
         edge_key = (min(u, v), max(u, v))
         flow = commodity_flows.get(edge_key, 0)
         mode = G[u][v][key]['mode']
         
-        # Tính độ rộng dựa trên lưu lượng
+        # Calculate width based on flow
         width = 2 + (flow / max_flow) * 10 if max_flow > 0 else 2
         
-        # Màu sắc và style dựa trên phương thức vận tải
-        if mode == 1:  # Đường bộ
-            edge_color = '#FF8C00'  # Cam đậm
+        # Colors and styles based on transport mode
+        if mode == 1:  # Road
+            edge_color = '#FF8C00'  # Deep orange
             connection_style = 'arc3,rad=0.2'
-        else:  # Đường thủy
-            edge_color = '#1E90FF'  # Xanh dương
+        else:  # Waterway
+            edge_color = '#1E90FF'  # Blue
             connection_style = 'arc3,rad=-0.2'
         
-        # Vẽ cạnh với mũi tên
+        # Draw edges with arrows
         nx.draw_networkx_edges(
             G, pos, edgelist=[(u, v)], 
             width=width, alpha=0.8, 
@@ -480,12 +480,12 @@ def _draw_single_commodity_network_improved(physical_edges, commodity_flows, pro
             connectionstyle=connection_style
         )
         
-        # Thêm label lưu lượng nếu có
+        # Add flow labels when available
         if flow > 0:
             x = (pos[u][0] + pos[v][0]) / 2
             y = (pos[u][1] + pos[v][1]) / 2
             
-            # Dịch chuyển label dựa trên phương thức
+            # Offset labels based on mode
             if mode == 1:
                 y += 0.2
             else:
@@ -495,15 +495,15 @@ def _draw_single_commodity_network_improved(physical_edges, commodity_flows, pro
                    fontsize=11, ha='center', va='center', fontweight='bold',
                    bbox=dict(boxstyle="round,pad=0.4", facecolor=color, alpha=0.9, edgecolor='black'))
     
-    # Vẽ nodes với kích thước lớn hơn
+    # Draw nodes with larger sizes
     nx.draw_networkx_nodes(G, pos, node_color='lightblue', 
                           node_size=1500, edgecolors='black', ax=ax)
     
-    # Node labels với tên tỉnh - font lớn hơn
+    # Node labels with province names - larger font
     node_labels = {node: province_names.get(node, f"Node {node}") for node in G.nodes()}
     nx.draw_networkx_labels(G, pos, labels=node_labels, font_size=12, ax=ax)
     
-    # Edge labels với độ dài
+    # Edge labels with distance
     edge_labels = {}
     for u, v, key in G.edges(keys=True):
         length = G[u][v][key]['length']
@@ -514,7 +514,7 @@ def _draw_single_commodity_network_improved(physical_edges, commodity_flows, pro
         x = (pos[u][0] + pos[v][0]) / 2
         y = (pos[u][1] + pos[v][1]) / 2
         
-        # Dịch chuyển label độ dài
+        # Offset distance labels
         if mode == 1:
             y += 0.3
             color_text = 'darkorange'
@@ -525,30 +525,30 @@ def _draw_single_commodity_network_improved(physical_edges, commodity_flows, pro
         ax.text(x, y, label, fontsize=10, color=color_text, ha='center', va='center',
                bbox=dict(boxstyle="round,pad=0.3", facecolor='white', alpha=0.8, edgecolor=color_text))
     
-    ax.set_title(f"{emoji} BIỂU ĐỒ MẠNG LƯỚI - {title}", 
+    ax.set_title(f"{emoji} NETWORK DIAGRAM - {title}", 
                 fontsize=18, fontweight='bold', pad=30, color=color)
     ax.axis('off')
     
-    # Thêm chú thích
+    # Add legend
     total_flow = sum(commodity_flows.values())
-    textstr = f'Tổng lưu lượng: {total_flow:,}'
+    textstr = f'Total flow: {total_flow:,}'
     props = dict(boxstyle='round', facecolor=color, alpha=0.3, edgecolor='black')
     ax.text(0.02, 0.98, textstr, transform=ax.transAxes, fontsize=13, fontweight='bold',
             verticalalignment='top', bbox=props)
     
-    # Thêm chú thích phương thức vận tải
+    # Add transport mode legend
     legend_elements = [
-        plt.Line2D([0], [0], color='#FF8C00', lw=4, label='Đường bộ', marker='>', markersize=15),
-        plt.Line2D([0], [0], color='#1E90FF', lw=4, label='Đường thủy', marker='>', markersize=15),
+        plt.Line2D([0], [0], color='#FF8C00', lw=4, label='Road', marker='>', markersize=15),
+        plt.Line2D([0], [0], color='#1E90FF', lw=4, label='Waterway', marker='>', markersize=15),
     ]
     ax.legend(handles=legend_elements, loc='upper right', fontsize=12)
     
     plt.tight_layout()
     return fig
 
-# [Các hàm còn lại giữ nguyên...]
+# [Remaining functions unchanged...]
 def create_commodity_flow_comparison(baseline_results, optimized_results, province_names):
-    """Tạo biểu đồ so sánh luồng hàng hóa trước và sau tối ưu"""
+    """Create a flow comparison chart before and after optimization"""
     passenger_baseline = {}
     passenger_optimized = {}
     rice_baseline = {}
@@ -574,75 +574,75 @@ def create_commodity_flow_comparison(baseline_results, optimized_results, provin
         elif commodity == 'container':
             container_optimized[edge_label] = flow
     
-    # Tạo DataFrame cho từng hàng hóa
+    # Create a DataFrame for each commodity
     edges = list(set(list(passenger_baseline.keys()) + list(passenger_optimized.keys())))
     
     passenger_df = pd.DataFrame({
-        'Tuyến đường': edges,
-        'Trước tối ưu': [passenger_baseline.get(edge, 0) for edge in edges],
-        'Sau tối ưu': [passenger_optimized.get(edge, 0) for edge in edges]
+        'Route': edges,
+        'Before optimization': [passenger_baseline.get(edge, 0) for edge in edges],
+        'After optimization': [passenger_optimized.get(edge, 0) for edge in edges]
     })
-    passenger_df['Chênh lệch'] = passenger_df['Sau tối ưu'] - passenger_df['Trước tối ưu']
+    passenger_df['Difference'] = passenger_df['After optimization'] - passenger_df['Before optimization']
     
     rice_df = pd.DataFrame({
-        'Tuyến đường': edges,
-        'Trước tối ưu': [rice_baseline.get(edge, 0) for edge in edges],
-        'Sau tối ưu': [rice_optimized.get(edge, 0) for edge in edges]
+        'Route': edges,
+        'Before optimization': [rice_baseline.get(edge, 0) for edge in edges],
+        'After optimization': [rice_optimized.get(edge, 0) for edge in edges]
     })
-    rice_df['Chênh lệch'] = rice_df['Sau tối ưu'] - rice_df['Trước tối ưu']
+    rice_df['Difference'] = rice_df['After optimization'] - rice_df['Before optimization']
     
     container_df = pd.DataFrame({
-        'Tuyến đường': edges,
-        'Trước tối ưu': [container_baseline.get(edge, 0) for edge in edges],
-        'Sau tối ưu': [container_optimized.get(edge, 0) for edge in edges]
+        'Route': edges,
+        'Before optimization': [container_baseline.get(edge, 0) for edge in edges],
+        'After optimization': [container_optimized.get(edge, 0) for edge in edges]
     })
-    container_df['Chênh lệch'] = container_df['Sau tối ưu'] - container_df['Trước tối ưu']
+    container_df['Difference'] = container_df['After optimization'] - container_df['Before optimization']
     
-    # Tạo biểu đồ với kích thước lớn hơn
+    # Create a larger figure
     fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(24, 8))
     
-    # Biểu đồ hành khách
+    # Passenger chart
     x = range(len(passenger_df))
     width = 0.35
     
-    ax1.bar([i - width/2 for i in x], passenger_df['Trước tối ưu'], width, 
-            label='Trước tối ưu', color='lightblue', alpha=0.7)
-    ax1.bar([i + width/2 for i in x], passenger_df['Sau tối ưu'], width, 
-            label='Sau tối ưu', color='#FF6B6B', alpha=0.7)
+    ax1.bar([i - width/2 for i in x], passenger_df['Before optimization'], width, 
+            label='Before optimization', color='lightblue', alpha=0.7)
+    ax1.bar([i + width/2 for i in x], passenger_df['After optimization'], width, 
+            label='After optimization', color='#FF6B6B', alpha=0.7)
     
-    ax1.set_xlabel('Tuyến đường', fontsize=12)
-    ax1.set_ylabel('Lưu lượng', fontsize=12)
-    ax1.set_title('LUỒNG HÀNH KHÁCH: Trước vs Sau Tối ưu', fontsize=14, fontweight='bold')
+    ax1.set_xlabel('Route', fontsize=12)
+    ax1.set_ylabel('Flow', fontsize=12)
+    ax1.set_title('PASSENGER FLOWS: Before vs After Optimization', fontsize=14, fontweight='bold')
     ax1.set_xticks(x)
-    ax1.set_xticklabels(passenger_df['Tuyến đường'], rotation=45, ha='right', fontsize=10)
+    ax1.set_xticklabels(passenger_df['Route'], rotation=45, ha='right', fontsize=10)
     ax1.legend(fontsize=11)
     ax1.grid(True, alpha=0.3)
     
-    # Biểu đồ lúa gạo
-    ax2.bar([i - width/2 for i in x], rice_df['Trước tối ưu'], width, 
-            label='Trước tối ưu', color='lightgreen', alpha=0.7)
-    ax2.bar([i + width/2 for i in x], rice_df['Sau tối ưu'], width, 
-            label='Sau tối ưu', color='#4ECDC4', alpha=0.7)
+    # Rice chart
+    ax2.bar([i - width/2 for i in x], rice_df['Before optimization'], width, 
+            label='Before optimization', color='lightgreen', alpha=0.7)
+    ax2.bar([i + width/2 for i in x], rice_df['After optimization'], width, 
+            label='After optimization', color='#4ECDC4', alpha=0.7)
     
-    ax2.set_xlabel('Tuyến đường', fontsize=12)
-    ax2.set_ylabel('Lưu lượng', fontsize=12)
-    ax2.set_title('LUỒNG LÚA GẠO: Trước vs Sau Tối ưu', fontsize=14, fontweight='bold')
+    ax2.set_xlabel('Route', fontsize=12)
+    ax2.set_ylabel('Flow', fontsize=12)
+    ax2.set_title('RICE FLOWS: Before vs After Optimization', fontsize=14, fontweight='bold')
     ax2.set_xticks(x)
-    ax2.set_xticklabels(rice_df['Tuyến đường'], rotation=45, ha='right', fontsize=10)
+    ax2.set_xticklabels(rice_df['Route'], rotation=45, ha='right', fontsize=10)
     ax2.legend(fontsize=11)
     ax2.grid(True, alpha=0.3)
     
-    # Biểu đồ container
-    ax3.bar([i - width/2 for i in x], container_df['Trước tối ưu'], width, 
-            label='Trước tối ưu', color='navajowhite', alpha=0.7)
-    ax3.bar([i + width/2 for i in x], container_df['Sau tối ưu'], width, 
-            label='Sau tối ưu', color='#FFEAA7', alpha=0.7)
+    # Container chart
+    ax3.bar([i - width/2 for i in x], container_df['Before optimization'], width, 
+            label='Before optimization', color='navajowhite', alpha=0.7)
+    ax3.bar([i + width/2 for i in x], container_df['After optimization'], width, 
+            label='After optimization', color='#FFEAA7', alpha=0.7)
     
-    ax3.set_xlabel('Tuyến đường', fontsize=12)
-    ax3.set_ylabel('Lưu lượng', fontsize=12)
-    ax3.set_title('LUỒNG CONTAINER: Trước vs Sau Tối ưu', fontsize=14, fontweight='bold')
+    ax3.set_xlabel('Route', fontsize=12)
+    ax3.set_ylabel('Flow', fontsize=12)
+    ax3.set_title('CONTAINER FLOWS: Before vs After Optimization', fontsize=14, fontweight='bold')
     ax3.set_xticks(x)
-    ax3.set_xticklabels(container_df['Tuyến đường'], rotation=45, ha='right', fontsize=10)
+    ax3.set_xticklabels(container_df['Route'], rotation=45, ha='right', fontsize=10)
     ax3.legend(fontsize=11)
     ax3.grid(True, alpha=0.3)
     
@@ -650,16 +650,16 @@ def create_commodity_flow_comparison(baseline_results, optimized_results, provin
     return fig, passenger_df, rice_df, container_df
 
 def create_cost_comparison(baseline_results, optimized_results):
-    """Tạo biểu đồ so sánh chi phí"""
+    """Create a cost comparison chart"""
     costs_comparison = {
-        'Loại chi phí': ['Đầu tư', 'Dịch vụ', 'Vận tải', 'Tổng cộng'],
-        'Trước tối ưu': [
+        'Cost category': ['Investment', 'Service', 'Transport', 'Total'],
+        'Before optimization': [
             baseline_results.get('investment_cost', 0),
             baseline_results.get('service_cost', 0),
             baseline_results.get('transport_cost', 0),
             baseline_results.get('objective', 0)
         ],
-        'Sau tối ưu': [
+        'After optimization': [
             optimized_results.get('investment_cost', 0),
             optimized_results.get('service_cost', 0),
             optimized_results.get('transport_cost', 0),
@@ -668,83 +668,83 @@ def create_cost_comparison(baseline_results, optimized_results):
     }
     
     df = pd.DataFrame(costs_comparison)
-    df['Tiết kiệm'] = df['Trước tối ưu'] - df['Sau tối ưu']
-    df['Tỷ lệ tiết kiệm (%)'] = (df['Tiết kiệm'] / df['Trước tối ưu'] * 100).round(1)
+    df['Savings'] = df['Before optimization'] - df['After optimization']
+    df['Savings rate (%)'] = (df['Savings'] / df['Before optimization'] * 100).round(1)
     
-    # Tạo biểu đồ với kích thước lớn hơn
+    # Create a larger figure
     fig, ax = plt.subplots(figsize=(12, 7))
     
     x = range(len(df))
     width = 0.35
     
-    ax.bar([i - width/2 for i in x], df['Trước tối ưu'], width, 
-           label='Trước tối ưu', color='lightcoral', alpha=0.7)
-    ax.bar([i + width/2 for i in x], df['Sau tối ưu'], width, 
-           label='Sau tối ưu', color='lightgreen', alpha=0.7)
+    ax.bar([i - width/2 for i in x], df['Before optimization'], width, 
+           label='Before optimization', color='lightcoral', alpha=0.7)
+    ax.bar([i + width/2 for i in x], df['After optimization'], width, 
+           label='After optimization', color='lightgreen', alpha=0.7)
     
-    ax.set_xlabel('Loại chi phí', fontsize=12)
-    ax.set_ylabel('Chi phí (đ)', fontsize=12)
-    ax.set_title('SO SÁNH CHI PHÍ: Trước vs Sau Tối ưu', fontsize=14, fontweight='bold')
+    ax.set_xlabel('Cost category', fontsize=12)
+    ax.set_ylabel('Cost (VND)', fontsize=12)
+    ax.set_title('COST COMPARISON: Before vs After Optimization', fontsize=14, fontweight='bold')
     ax.set_xticks(x)
-    ax.set_xticklabels(df['Loại chi phí'], fontsize=11)
+    ax.set_xticklabels(df['Cost category'], fontsize=11)
     ax.legend(fontsize=11)
     ax.grid(True, alpha=0.3)
     
-    # Thêm giá trị trên các cột
+    # Add values above each bar
     for i, (_, row) in enumerate(df.iterrows()):
-        ax.text(i - width/2, row['Trước tối ưu'] + 10000, f'{row["Trước tối ưu"]:,.0f}', 
+        ax.text(i - width/2, row['Before optimization'] + 10000, f'{row["Before optimization"]:,.0f}', 
                 ha='center', va='bottom', fontsize=9)
-        ax.text(i + width/2, row['Sau tối ưu'] + 10000, f'{row["Sau tối ưu"]:,.0f}', 
+        ax.text(i + width/2, row['After optimization'] + 10000, f'{row["After optimization"]:,.0f}', 
                 ha='center', va='bottom', fontsize=9)
     
     plt.tight_layout()
     return fig, df
 
-# ======== ỨNG DỤNG STREAMLIT ========
+# ======== STREAMLIT APPLICATION ========
 def main():
-    st.markdown('<div class="main-header">🚚 HỆ THỐNG TỐI ƯU MẠNG LƯỚI VẬN TẢI ĐA PHƯƠNG THỨC</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">🚚 MULTIMODAL TRANSPORT NETWORK OPTIMIZATION SYSTEM</div>', unsafe_allow_html=True)
     
-    # Sidebar - Thông số đầu vào
-    st.sidebar.header("📊 THIẾT LẬP THÔNG SỐ")
+    # Sidebar - Input parameters
+    st.sidebar.header("📊 PARAMETER SETTINGS")
     
-    # Thông tin cơ bản
+    # Basic information
     province_names = {
         0: "An Giang",
-        1: "Đồng Tháp", 
-        2: "Cần Thơ",
-        3: "TP.HCM",
-        4: "Vĩnh Long"
+        1: "Dong Thap", 
+        2: "Can Tho",
+        3: "Ho Chi Minh City",
+        4: "Vinh Long"
     }
     
-    # Nhu cầu vận tải
-    st.sidebar.subheader("📦 Nhu cầu Vận tải")
-    passenger_1_4 = st.sidebar.slider("Hành khách: An Giang → TP.HCM", 1000, 5000, 3000, 100)
-    passenger_2_5 = st.sidebar.slider("Hành khách: Đồng Tháp → Vĩnh Long", 1000, 5000, 2800, 100)
-    rice_2_4 = st.sidebar.slider("Lúa gạo: Đồng Tháp → TP.HCM", 2000, 8000, 4000, 100)
-    container_1_3 = st.sidebar.slider("Container: An Giang → Cần Thơ", 1000, 4000, 2000, 100)
+    # Transport demand
+    st.sidebar.subheader("📦 Transport Demand")
+    passenger_1_4 = st.sidebar.slider("Passengers: An Giang → Ho Chi Minh City", 1000, 5000, 3000, 100)
+    passenger_2_5 = st.sidebar.slider("Passengers: Dong Thap → Vinh Long", 1000, 5000, 2800, 100)
+    rice_2_4 = st.sidebar.slider("Rice: Dong Thap → Ho Chi Minh City", 2000, 8000, 4000, 100)
+    container_1_3 = st.sidebar.slider("Container: An Giang → Can Tho", 1000, 4000, 2000, 100)
     
-    # Chi phí nâng cấp
-    st.sidebar.subheader("💰 Chi phí Nâng cấp")
-    hub_upgrade_cost = st.sidebar.slider("Chi phí nâng cấp Hub (Cần Thơ)", 500, 2000, 1000, 50)
-    road_upgrade_cost = st.sidebar.slider("Chi phí nâng cấp Đường bộ", 400, 1500, 800, 50)
-    water_upgrade_cost = st.sidebar.slider("Chi phí nâng cấp Đường thủy", 200, 1000, 500, 50)
+    # Upgrade costs
+    st.sidebar.subheader("💰 Upgrade Costs")
+    hub_upgrade_cost = st.sidebar.slider("Hub upgrade cost (Can Tho)", 500, 2000, 1000, 50)
+    road_upgrade_cost = st.sidebar.slider("Road upgrade cost", 400, 1500, 800, 50)
+    water_upgrade_cost = st.sidebar.slider("Waterway upgrade cost", 200, 1000, 500, 50)
     
-    # Công suất
-    st.sidebar.subheader("🏗️ Công suất")
-    hub_capacity_0 = st.sidebar.slider("Công suất Hub ban đầu", 1000, 3000, 2000, 100)
-    hub_capacity_1 = st.sidebar.slider("Công suất Hub sau nâng cấp", 5000, 10000, 7000, 100)
-    road_capacity = st.sidebar.slider("Công suất Đường bộ sau nâng cấp", 2000, 5000, 3000, 100)
-    water_capacity = st.sidebar.slider("Công suất Đường thủy sau nâng cấp", 3000, 6000, 4000, 100)
+    # Capacity
+    st.sidebar.subheader("🏗️ Capacity")
+    hub_capacity_0 = st.sidebar.slider("Initial hub capacity", 1000, 3000, 2000, 100)
+    hub_capacity_1 = st.sidebar.slider("Hub capacity after upgrade", 5000, 10000, 7000, 100)
+    road_capacity = st.sidebar.slider("Road capacity after upgrade", 2000, 5000, 3000, 100)
+    water_capacity = st.sidebar.slider("Waterway capacity after upgrade", 3000, 6000, 4000, 100)
     
-    # Chi phí dịch vụ
-    st.sidebar.subheader("🔧 Chi phí Khác")
-    hub_service_cost_val = st.sidebar.slider("Chi phí dịch vụ Hub", 0.5, 3.0, 1.0, 0.1)
-    switch_cost_val = st.sidebar.slider("Chi phí chuyển đổi phương thức", 1, 5, 2, 1)
+    # Service costs
+    st.sidebar.subheader("🔧 Other Costs")
+    hub_service_cost_val = st.sidebar.slider("Hub service cost", 0.5, 3.0, 1.0, 0.1)
+    switch_cost_val = st.sidebar.slider("Mode switching cost", 1, 5, 2, 1)
     
-    # Nút chạy mô hình
-    if st.sidebar.button("🎯 CHẠY MÔ HÌNH TỐI ƯU", type="primary"):
-        with st.spinner("Đang tối ưu hóa mạng lưới vận tải..."):
-            # Dữ liệu đồ thị vật lý
+    # Run model button
+    if st.sidebar.button("🎯 RUN OPTIMIZATION MODEL", type="primary"):
+        with st.spinner("Optimizing the transport network..."):
+            # Physical graph data
             n_physical = 5
             physical_edges = [
                 (0, 2, 1, 45), (0, 2, 2, 41),
@@ -756,7 +756,7 @@ def main():
                 (3, 4, 1, 67), (3, 4, 2, 85)
             ]
             
-            # Tạo baseline model
+            # Create the baseline model
             baseline_model_data = {
                 'demands': {
                     ('g1', (1, 4)): passenger_1_4,
@@ -767,10 +767,10 @@ def main():
             }
             baseline_results = create_baseline_model(baseline_model_data)
             
-            # Xây dựng đồ thị mở rộng
+            # Build the expanded graph
             G_exp, _ = build_expanded_graph(n_physical, physical_edges)
             
-            # Chuẩn bị dữ liệu cho mô hình tối ưu
+            # Prepare data for the optimization model
             model_data = {
                 'T': [1, 2],
                 'real_nodes': [1, 2, 3, 4, 5],
@@ -808,141 +808,141 @@ def main():
                 }
             }
             
-            # Chạy mô hình tối ưu
+            # Run the optimization model
             optimized_results = create_optimization_model(model_data)
             
-            # Lưu kết quả vào session state
+            # Store results in the session state
             st.session_state.baseline_results = baseline_results
             st.session_state.optimized_results = optimized_results
             st.session_state.model_data = model_data
             st.session_state.physical_edges = physical_edges
             st.session_state.province_names = province_names
     
-    # Hiển thị kết quả
+    # Display results
     if 'optimized_results' in st.session_state:
         baseline_results = st.session_state.baseline_results
         optimized_results = st.session_state.optimized_results
         physical_edges = st.session_state.physical_edges
         province_names = st.session_state.province_names
         
-        st.markdown('<div class="sub-header">📈 KẾT QUẢ TỐI ƯU HÓA</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sub-header">📈 OPTIMIZATION RESULTS</div>', unsafe_allow_html=True)
         
-        # Hiển thị các chỉ số chính
+        # Display key metrics
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
             cost_saving = baseline_results.get('objective', 0) - optimized_results.get('objective', 0)
-            st.metric("Tổng Chi phí", 
-                     f"{optimized_results.get('objective', 0):,.0f} đ",
-                     f"Tiết kiệm: {cost_saving:,.0f} đ")
+            st.metric("Total cost", 
+                     f"{optimized_results.get('objective', 0):,.0f} VND",
+                     f"Savings: {cost_saving:,.0f} VND")
         with col2:
-            st.metric("Chi phí Đầu tư", f"{optimized_results.get('investment_cost', 0):,.0f} đ")
+            st.metric("Investment cost", f"{optimized_results.get('investment_cost', 0):,.0f} VND")
         with col3:
-            st.metric("Chi phí Vận tải", f"{optimized_results.get('transport_cost', 0):,.0f} đ")
+            st.metric("Transport cost", f"{optimized_results.get('transport_cost', 0):,.0f} VND")
         with col4:
             status = optimized_results.get('status', 'Unknown')
             status_color = "🟢" if status == 'Optimal' else "🔴"
-            st.metric("Trạng thái", f"{status_color} {status}")
+            st.metric("Status", f"{status_color} {status}")
         
-        # Biểu đồ so sánh mạng lưới CẢI TIẾN
-        st.markdown('<div class="sub-header">🗺️ SO SÁNH MẠNG LƯỚI TRƯỚC VÀ SAU TỐI ƯU</div>', unsafe_allow_html=True)
-        st.markdown("**🆕 CẢI TIẾN:** Layout được tối ưu hóa, các node cách xa nhau, dễ nhìn hơn")
+        # Improved network comparison chart
+        st.markdown('<div class="sub-header">🗺️ NETWORK COMPARISON BEFORE AND AFTER OPTIMIZATION</div>', unsafe_allow_html=True)
+        st.markdown("**🆕 IMPROVEMENT:** Layout optimized with greater spacing between nodes for clarity")
         comparison_fig = draw_network_comparison(physical_edges, baseline_results, optimized_results, province_names)
         st.pyplot(comparison_fig)
         
-        # BIỂU ĐỒ MẠNG LƯỚI CHO TỪNG LOẠI HÀNG HÓA CẢI TIẾN
-        st.markdown('<div class="sub-header">📊 BIỂU ĐỒ MẠNG LƯỚI PHÂN BỔ TỪNG LOẠI HÀNG HÓA</div>', unsafe_allow_html=True)
-        st.markdown("**🆕 CẢI TIẾN:** Kích thước lớn hơn, layout rõ ràng, dễ phân biệt đường bộ và đường thủy")
+        # Enhanced network diagrams for each commodity
+        st.markdown('<div class="sub-header">📊 NETWORK DIAGRAMS BY COMMODITY</div>', unsafe_allow_html=True)
+        st.markdown("**🆕 IMPROVEMENT:** Larger visuals, clear layout, easy to distinguish road and waterway flows")
         
-        # Tạo các biểu đồ riêng biệt
+        # Create separate charts
         passenger_fig, rice_fig, container_fig = create_commodity_specific_networks(
             physical_edges, optimized_results['flow_by_commodity'], province_names
         )
         
-        # Hiển thị từng biểu đồ trong các tab riêng biệt
-        tab1, tab2, tab3 = st.tabs(["👥 HÀNH KHÁCH", "🌾 LÚA GẠO", "📦 CONTAINER"])
+        # Display each chart in separate tabs
+        tab1, tab2, tab3 = st.tabs(["👥 PASSENGERS", "🌾 RICE", "📦 CONTAINER"])
         
         with tab1:
             st.pyplot(passenger_fig)
             total_passenger = sum(flow for (commodity, _), flow in optimized_results['flow_by_commodity'].items() if commodity == 'passenger')
-            st.metric("Tổng lưu lượng hành khách", f"{total_passenger:,}")
+            st.metric("Total passenger flow", f"{total_passenger:,}")
             
         with tab2:
             st.pyplot(rice_fig)
             total_rice = sum(flow for (commodity, _), flow in optimized_results['flow_by_commodity'].items() if commodity == 'rice')
-            st.metric("Tổng lưu lượng lúa gạo", f"{total_rice:,}")
+            st.metric("Total rice flow", f"{total_rice:,}")
             
         with tab3:
             st.pyplot(container_fig)
             total_container = sum(flow for (commodity, _), flow in optimized_results['flow_by_commodity'].items() if commodity == 'container')
-            st.metric("Tổng lưu lượng container", f"{total_container:,}")
+            st.metric("Total container flow", f"{total_container:,}")
         
-        # Biểu đồ so sánh chi phí
-        st.markdown('<div class="sub-header">💰 SO SÁNH CHI PHÍ</div>', unsafe_allow_html=True)
+        # Cost comparison chart
+        st.markdown('<div class="sub-header">💰 COST COMPARISON</div>', unsafe_allow_html=True)
         cost_fig, cost_df = create_cost_comparison(baseline_results, optimized_results)
         st.pyplot(cost_fig)
         st.dataframe(cost_df, use_container_width=True)
         
-        # Biểu đồ so sánh luồng hàng hóa
-        st.markdown('<div class="sub-header">📈 SO SÁNH LUỒNG HÀNG HÓA CHI TIẾT</div>', unsafe_allow_html=True)
+        # Flow comparison chart
+        st.markdown('<div class="sub-header">📈 DETAILED FLOW COMPARISON</div>', unsafe_allow_html=True)
         flow_fig, passenger_df, rice_df, container_df = create_commodity_flow_comparison(baseline_results, optimized_results, province_names)
         st.pyplot(flow_fig)
         
-        # Hiển thị bảng dữ liệu chi tiết
+        # Display detailed data tables
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            st.markdown('##### 👥 LUỒNG HÀNH KHÁCH CHI TIẾT')
+            st.markdown('##### 👥 DETAILED PASSENGER FLOWS')
             st.dataframe(passenger_df, use_container_width=True)
         
         with col2:
-            st.markdown('##### 🌾 LUỒNG LÚA GẠO CHI TIẾT')
+            st.markdown('##### 🌾 DETAILED RICE FLOWS')
             st.dataframe(rice_df, use_container_width=True)
         
         with col3:
-            st.markdown('##### 📦 LUỒNG CONTAINER CHI TIẾT')
+            st.markdown('##### 📦 DETAILED CONTAINER FLOWS')
             st.dataframe(container_df, use_container_width=True)
         
-        # Kết quả nâng cấp
-        st.markdown('<div class="sub-header">🏗️ KẾT QUẢ NÂNG CẤP</div>', unsafe_allow_html=True)
+        # Upgrade results
+        st.markdown('<div class="sub-header">🏗️ UPGRADE RESULTS</div>', unsafe_allow_html=True)
         
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("**Hub được nâng cấp:**")
+            st.markdown("**Upgraded hubs:**")
             upgraded_hubs = optimized_results.get('upgraded_hubs', [])
             if upgraded_hubs:
                 for hub in upgraded_hubs:
                     st.markdown(f'<span class="upgraded">✅ {province_names.get(hub, f"Node {hub}")}</span>', unsafe_allow_html=True)
             else:
-                st.markdown('<span class="not-upgraded">❌ Không có hub nào được nâng cấp</span>', unsafe_allow_html=True)
+                st.markdown('<span class="not-upgraded">❌ No hubs were upgraded</span>', unsafe_allow_html=True)
         
         with col2:
-            st.markdown("**Tuyến đường được nâng cấp:**")
+            st.markdown("**Upgraded routes:**")
             upgraded_arcs = optimized_results.get('upgraded_arcs', [])
             if upgraded_arcs:
                 for arc in upgraded_arcs:
                     start_node, end_virtual = arc
                     end_node = int(end_virtual.split('^')[0]) if isinstance(end_virtual, str) and '^' in end_virtual else end_virtual
-                    mode = "Đường bộ" if '^1' in str(end_virtual) else "Đường thủy"
+                    mode = "Road" if '^1' in str(end_virtual) else "Waterway"
                     st.markdown(f'<span class="upgraded">✅ {province_names.get(start_node, f"Node {start_node}")} → {province_names.get(end_node, f"Node {end_node}")} ({mode})</span>', unsafe_allow_html=True)
             else:
-                st.markdown('<span class="not-upgraded">❌ Không có tuyến đường nào được nâng cấp</span>', unsafe_allow_html=True)
+                st.markdown('<span class="not-upgraded">❌ No routes were upgraded</span>', unsafe_allow_html=True)
     
     else:
-        # Hiển thị hướng dẫn khi chưa chạy mô hình
+        # Display instructions when the model has not run
         st.markdown("""
         <div class="result-box">
-        <h3>👋 Chào mừng đến với Hệ thống Tối ưu Mạng lưới Vận tải</h3>
-        <p>Hệ thống này giúp tối ưu hóa mạng lưới vận tải đa phương thức với các tính năng:</p>
+        <h3>👋 Welcome to the Transport Network Optimization System</h3>
+        <p>This application optimizes a multimodal transport network with the following features:</p>
         <ul>
-            <li>🎯 <strong>Tối ưu hóa chi phí tổng thể</strong></li>
-            <li>🏗️ <strong>Quyết định nâng cấp hạ tầng</strong></li>
-            <li>🚚 <strong>Phân bổ luồng vận tải tối ưu</strong></li>
-            <li>📊 <strong>So sánh trước/sau tối ưu</strong></li>
-            <li>🆕 <strong>Biểu đồ mạng lưới cải tiến:</strong> Layout rõ ràng, dễ nhìn, đường bộ và đường thủy riêng biệt</li>
+            <li>🎯 <strong>Optimize total costs</strong></li>
+            <li>🏗️ <strong>Support infrastructure upgrade decisions</strong></li>
+            <li>🚚 <strong>Allocate transport flows optimally</strong></li>
+            <li>📊 <strong>Compare before and after optimization</strong></li>
+            <li>🆕 <strong>Enhanced network diagrams:</strong> Clear layout with separate road and waterway modes</li>
         </ul>
-        <p><strong>Để bắt đầu:</strong> Vui lòng thiết lập các thông số ở thanh bên trái và nhấn nút "CHẠY MÔ HÌNH TỐI ƯU".</p>
+        <p><strong>To get started:</strong> Configure the parameters in the left sidebar and click \"RUN OPTIMIZATION MODEL\".</p>
         </div>
         """, unsafe_allow_html=True)
 
