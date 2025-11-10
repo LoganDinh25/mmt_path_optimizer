@@ -1,12 +1,12 @@
 # **MMT Path Optimizer**
 ### *Optimizing Multimodal Transportation Using Nearest Shortest Path*
-**Interactive Solver | Pyomo + HiGHS | Streamlit | No Conda | No Gurobi**
+**Interactive Solver | PuLP/Gurobi + Streamlit | Comprehensive Network Optimization**
 
 ---
 
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
-[![Pyomo](https://img.shields.io/badge/Pyomo-6.7%2B-orange)](https://pyomo.readthedocs.io/)
-[![HiGHS](https://img.shields.io/badge/Solver-HiGHS-green)](https://highs.dev/)
+[![NetworkX](https://img.shields.io/badge/Graph-NetworkX-green)](https://NetworkX.io/)
+[![Gurobi](https://img.shields.io/badge/Optimization-PuLP%252FGurobi-orange)](hhttps://www.gurobi.com/)
 [![Streamlit](https://img.shields.io/badge/Web-Streamlit-red)](https://streamlit.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -14,15 +14,16 @@
 
 ## Overview
 
-**MMT Path Optimizer** is a research-driven optimization tool that models and solves **multimodal transportation problems** using the **nearest shortest path** principle.
+**MMT Path Optimizer** is a research-driven optimization tool that models and solves **multimodal transportation problems** using the **nearest shortest path** principle using Mixed-Integer Linear Programming (MILP).
 
 It supports real-time exploration of:
 - **Multi-modal networks** (road, waterway, etc.)
 - **Shortest path computation** with modal switching constraints
-- **Cost and time optimization** across different transport types
+- **Cost optimization** across different transport types
+- **Multi-commodity** flow optimization (passengers, rice, fish )
 - **Visualization** of routes and decisions through a web dashboard
 
-> Inspired by **multi-modal optimization research** and **modern MILP solvers** like HiGHS.
+> Built for transportation network planning and infrastructure investment analysis.
 
 ---
 
@@ -43,7 +44,7 @@ It seeks to:
 |----------|-------------|
 | **Nearest Shortest Path Algorithm** | Finds efficient routes considering mode-switch penalties |
 | **Interactive Dashboard** | Adjust network parameters in real-time |
-| **MIP Optimization** | Solved using Pyomo + HiGHS |
+| **Optimization** | Solved using Gurobi + PuLP |
 | **Visual Network Output** | Plotly-based network visualization |
 | **Lightweight Setup** | No Conda, no commercial solvers required |
 
@@ -65,7 +66,7 @@ Installation (Mac/Linux/Windows – No Conda)
 pip install streamlit pyomo highspy networkx plotly pandas
 
 # 3. Run the app
-streamlit run app.py
+streamlit run transport_optimization_app_.py
 
 
 Note: Works entirely with open-source solvers — no Gurobi or Conda required.
@@ -73,8 +74,8 @@ Note: Works entirely with open-source solvers — no Gurobi or Conda required.
 Project Structure
 mmt_path_optimizer/
 │
-├── app.py                   # Streamlit web app
-├── model_core.py             # Pyomo model for nearest-shortest-path
+├── transport_optimization_app_.py                   # Streamlit web app
+├── model_core.py             # Pmodel for nearest-shortest-path
 ├── utils/                    # Helper modules (graph building, plotting)
 ├── data/                     # Input CSVs (nodes, arcs, parameters)
 ├── requirements.txt
