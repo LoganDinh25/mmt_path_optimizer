@@ -54,7 +54,7 @@ It seeks to:
 Run locally:
 
 ```bash
-streamlit run app.py
+streamlit run transport_optimization_app_.py
 
 Installation (Mac/Linux/Windows – No Conda)
 # 1. Install Python 3.9+
@@ -121,9 +121,17 @@ Cloud-based solver interface (via API)
 
 References
 
-Caris, A., Macharis, C., & Janssens, G. (2013). Network design models for intermodal transport systems: A literature review.
+ [1]Fragkos, I., Cordeau, J. F., & Jans, R., “The Multi-Period Multi-Commodity Network Design Problem,” CIRRELT Technical Report, 2017.
 
-Khosravi et al. (2024). Hub Congestion Modeling and Optimization.
+[2] Jernigan, N. R., Multi-Modal, Multi-Period, Multi-Commodity Transportation: Models and Algorithms, Diss. Massachusetts Institute of Technology, 2014.
+
+[3] Orozco-Fontalvo, M., Cantillo, V., & Miranda, P. A., “A Stochastic, Multi-Commodity Multi-Period
+Inventory-Location Problem: Modeling and Solving an Industrial Application,” in Proceedings of the
+International Conference on Computational Logistics, pp. 317–331, Cham: Springer International
+Publishing, 2019.
+
+[4] Bayram, V., Aydo˘gan, C¸ . & Kargar, K., ”Multi-period hub network design from a dual perspective:
+An integrated approach considering congestion, demand uncertainty, and service quality optimization”, European Journal of Operational Research, 2025.
 
 Pyomo Documentation: https://pyomo.readthedocs.io
 
